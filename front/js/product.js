@@ -2,6 +2,8 @@
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const productId = urlParams.get("id")
+let prix = 0
+let imgLink, imgAltTxt
 
 //Résupération de l'objet grâce à l'id dans l'api
 fetch(`http://localhost:3000/api/products/${productId}`)
@@ -14,6 +16,9 @@ fetch(`http://localhost:3000/api/products/${productId}`)
 function uniqueObject(canape) {
     // On récupère toutes les données du canapé
     const { altTxt, colors, description, imageUrl, name, price } = canape
+    prix = price
+    imgLink = imageUrl
+    imgAltTxt = altTxt
     // On appelle nos fonctions qui vont creer ou s'imbriquer dans les éléments html
     makeProductImg(imageUrl, altTxt)
     makeProductTitle(name)
@@ -67,4 +72,62 @@ function makeProductColors(colors){
         productColors.appendChild(option)                     // imbrication de chaque option à sa valeur
     })
     
+}
+
+
+
+
+//    LOCAL STORAGE    ///
+
+
+
+
+// On séléctionne le bouton et on lui donne un événement au click
+const button = document.querySelector("#addToCart")
+button.addEventListener("click", orderClick)
+
+
+
+
+// Fonction qui détermine l'évènement du click
+function orderClick(){
+    const color = document.querySelector("#colors").value
+    const quantity = document.querySelector("#quantity").value  // Va chercher les valeurs ( au moment du click) de couleur et quantité
+    if (checkErrorValue(color, quantity)) return  // * vérifie si les valeurs sont correctes ( bloque la redirection si valeurs nulles) *
+    saveOrder(color, quantity)                    // ** Enregistre les data **
+    rootToCart()                                  // *** Redirige sur la page panier ***
+}
+
+
+
+
+// * Verifie si il y a des erreurs dans les valeurs ( null)  Alert et bloque la redirection si présence d'un null *
+function checkErrorValue(color, quantity){
+    if (color == null || color === "" || quantity == null || quantity == 0){
+        alert("Selectionnez une couleur et une quantité")
+        return true
+    }
+}
+
+
+
+// **  Enregistre les data et les transformes en objet JSON **
+function saveOrder(color, quantity){
+    const productData = {
+    id : productId,
+    color : color,
+    quantity : Number(quantity),
+    price : prix,
+    imageUrl : imgLink,
+    altTxt : imgAltTxt
+    }
+    localStorage.setItem(productId, JSON.stringify(productData))
+}
+
+
+
+
+// *** Redirige vers la page panier ***
+function rootToCart(){
+    window.location.href = "cart.html"
 }

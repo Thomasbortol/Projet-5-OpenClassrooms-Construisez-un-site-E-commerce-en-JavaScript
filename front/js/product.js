@@ -3,7 +3,7 @@ const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const productId = urlParams.get("id")
 let prix = 0
-let imgLink, imgAltTxt
+let imgLink, imgAltTxt, productName
 
 //Résupération de l'objet grâce à l'id dans l'api
 fetch(`http://localhost:3000/api/products/${productId}`)
@@ -19,6 +19,7 @@ function uniqueObject(canape) {
     prix = price
     imgLink = imageUrl
     imgAltTxt = altTxt
+    productName = name
     // On appelle nos fonctions qui vont creer ou s'imbriquer dans les éléments html
     makeProductImg(imageUrl, altTxt)
     makeProductTitle(name)
@@ -93,7 +94,7 @@ button.addEventListener("click", orderClick)
 function orderClick(){
     const color = document.querySelector("#colors").value
     const quantity = document.querySelector("#quantity").value  // Va chercher les valeurs ( au moment du click) de couleur et quantité
-    if (checkErrorValue(color, quantity)) return  // * vérifie si les valeurs sont correctes ( bloque la redirection si valeurs nulles) *
+    if (checkErrorValue(color, quantity)) return  // * vérifie si les valeurs sont incorrectes ( bloque la redirection si valeurs nulles) *
     saveOrder(color, quantity)                    // ** Enregistre les data **
     rootToCart()                                  // *** Redirige sur la page panier ***
 }
@@ -119,7 +120,8 @@ function saveOrder(color, quantity){
     quantity : Number(quantity),
     price : prix,
     imageUrl : imgLink,
-    altTxt : imgAltTxt
+    altTxt : imgAltTxt,
+    name : productName
     }
     localStorage.setItem(productId, JSON.stringify(productData))
 }

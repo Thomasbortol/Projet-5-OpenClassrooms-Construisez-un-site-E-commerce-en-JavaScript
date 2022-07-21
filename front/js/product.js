@@ -114,6 +114,7 @@ function checkErrorValue(color, quantity){
 
 // **  Enregistre les data et les transformes en objet JSON **
 function saveOrder(color, quantity){
+    const key = `${productId}-${color}`
     const productData = {
     id : productId,
     color : color,
@@ -123,7 +124,7 @@ function saveOrder(color, quantity){
     altTxt : imgAltTxt,
     name : productName
     }
-    localStorage.setItem(productId, JSON.stringify(productData))
+    localStorage.setItem(key, JSON.stringify(productData))
 }
 
 

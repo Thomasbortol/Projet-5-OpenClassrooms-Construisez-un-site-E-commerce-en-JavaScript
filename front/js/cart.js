@@ -201,7 +201,7 @@ function addSuppressionToSettings(settings, item){
 // fonction qui va reconnaitre le produit a supprimer
 function deleteItem(item){
     const itemToDelete = cart.findIndex(product => product.id === item.id && product.color === item.color)
-    cart.splice(itemToDelete, 1)            // splice selectionne l'item en supprime 1 à partir de l'item séléctionné (donc uniquement ce dernier)
+    cart.splice(itemToDelete, 1)            // array.splice selectionne l'item en supprime 1 à partir de l'item séléctionné (donc uniquement ce dernier)
     displayTotalPrice()
     displayTotalQuantity()                  // on appelle les deux fonctions pour recalculer le prix et la quantité totale
     deleteDataFromCache(item)               // appel de la fonction qui supprime le produit du local storage
@@ -224,13 +224,39 @@ function deleteDataFromCache(item){
 }
 
 
+//////////////////////////////////////////////////////////////////////////// FORMULAIRE DE DONNEES //////////////////////////////////////////////////////////
+
+const orderButton = document.querySelector("#order")
+orderButton.addEventListener("click", (e) => submitForm(e))
+
+function submitForm(e){
+    e.preventDefault()  // pour ne pas que l'évenement se produise /empèche le rafraichissement de la page, à supprimer aprés le code terminé !!!
+    if (cart.length === 0) alert ("Veuillez ajouter un article au panier")
+    const form =  document.querySelector(".cart__order__form")
+    const body = makeRequestBody()  // on declare et apelle
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json;charset=utf-8"
+        }
+    })
+    .then((res) => res.json())
+    .then((data) => console.log(data))
+    //console.log(form.elements);
+}
 
 
-
-/////////////////////////////////////////////////////////////////////////////////////////  a remonter
-
-
-
-
-
-
+function makeRequestBody(){
+    const body = {
+        contact: {
+            firstName : "pouet",
+            lastName : "pouet",
+            adress : "pouet",
+            city : "pouet",
+            email : "pouet"
+        },
+        products: ["107fb5b75607497b96722bda5b504926"]
+    }
+    return body
+}

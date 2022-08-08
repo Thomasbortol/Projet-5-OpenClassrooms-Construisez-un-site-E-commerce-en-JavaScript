@@ -102,10 +102,14 @@ function orderClick(){
 
 
 
-// * Verifie si il y a des erreurs dans les valeurs ( null)  Alert et bloque la redirection si présence d'un null *
+// * Verifie si il y a des erreurs dans les valeurs ( null)  Alerte, change de couleur et bloque la redirection si présence d'un null *
 function checkErrorValue(color, quantity){
+    let checkColor = document.querySelector("#colors");
+    let checkQuantity = document.querySelector("#quantity");
     if (color == null || color === "" || quantity == null || quantity == 0){
         alert("Selectionnez une couleur et une quantité")
+        checkColor.style.backgroundColor = "#FBBCBC"
+        checkQuantity.style.backgroundColor = "#FBBCBC"
         return true
     }
 }

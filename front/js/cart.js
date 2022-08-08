@@ -129,3 +129,192 @@ function displayTotalQuantity(){
     let totalQuantity = document.querySelector("#totalQuantity");
     totalQuantity.textContent = quantiteTotale;
 }
+
+
+
+/////////////////////// Mise en place du formulaire ///////////////////////////
+
+
+
+let form = document.querySelector(".cart__order__form")
+let inputFirstName = document.querySelector("#firstName");
+let inputLastName = document.querySelector("#lastName");
+let inputAddress = document.querySelector("#address");
+let inputCity = document.querySelector("#city");
+let inputEmail = document.querySelector("#email")
+let submit = document.querySelector("#order")
+
+
+////// Validation du formulaire par les expressions régulières (RegExp)
+
+// REGEX Création de 3 objets regex  (Besoin d'un regex spécifique pour l'adresse, et pour l'email)
+let regularRegExp = new RegExp("^[a-zA-Z ,.'-]+$");
+let addressRegExp = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
+let emailRegExp = new RegExp("^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,20}$");
+
+
+// method .test permet de tester la compatibilité entre l'objet regex et la chaine de caractère
+// FIRST NAME
+function valueFirstName() {
+    let firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+    let inputFirstName = document.querySelector("#firstName");
+
+    if (regularRegExp.test(inputFirstName.value)) {
+        firstNameErrorMsg.innerHTML = '';
+        inputFirstName.style.backgroundColor = "white";
+        return true
+    } else {
+        firstNameErrorMsg.innerHTML = 'Veuillez renseigner votre prénom.';
+        inputFirstName.style.backgroundColor = "#FBBCBC";
+        return false
+    }
+}
+
+// LAST NAME
+function valueLastName() {
+    let lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+    let inputLastName = document.querySelector("#lastName");
+
+    if (regularRegExp.test(inputLastName.value)) {
+        lastNameErrorMsg.innerHTML = '';
+        inputLastName.style.backgroundColor = "white";
+        return true
+    } else {
+        lastNameErrorMsg.innerHTML = 'Veuillez renseigner votre nom.';
+        inputLastName.style.backgroundColor = "#FBBCBC";
+        return false
+    }
+}
+
+
+// ADRESSE
+function valueAddress() {
+    let addressErrorMsg = document.getElementById("addressErrorMsg");
+    let inputAddress = document.querySelector("#address");
+
+    if (addressRegExp.test(inputAddress.value)) {
+        addressErrorMsg.innerHTML = '';
+        inputAddress.style.backgroundColor = "white";
+        return true
+    } else {
+        addressErrorMsg.innerHTML = 'Veuillez renseigner une adresse valide.';
+        inputAddress.style.backgroundColor = "#FBBCBC";
+        return false
+    }
+}
+
+// VILLE
+function valueCity() {
+    let cityErrorMsg = document.getElementById("cityErrorMsg");
+    let inputCity = document.querySelector("#city");
+
+    if (regularRegExp.test(inputCity.value)) {
+        cityErrorMsg.innerHTML = '';
+        inputCity.style.backgroundColor = "white";
+        return true
+    } else {
+        cityErrorMsg.innerHTML = 'Veuillez renseigner une ville.';
+        inputCity.style.backgroundColor = "#FBBCBC";
+        return false
+    }
+} 
+
+
+// EMAIL
+function valueEmail() {
+    let emailErrorMsg = document.getElementById("emailErrorMsg");
+    let inputEmail = document.querySelector("#email")
+
+    if (emailRegExp.test(inputEmail.value)) {
+        emailErrorMsg.innerHTML = '';
+        inputEmail.style.backgroundColor = "white";
+        return true
+    } else {
+        emailErrorMsg.innerHTML = 'Veuillez renseigner un email valide.';
+        inputEmail.style.backgroundColor = "#FBBCBC";
+        return false
+    }
+}
+
+// Inscription dans le formulaire 
+getForm()
+function getForm() { 
+
+    form.firstName.addEventListener('change', () => {
+        valueFirstName(this);
+    })
+
+    form.lastName.addEventListener('change', () => {
+        valueLastName(this);
+    })
+
+    form.address.addEventListener('change', () => {
+        valueAddress(this);
+    })
+
+    form.city.addEventListener('change', () => {
+        valueCity(this);
+    })
+
+    form.email.addEventListener('change', () => {
+        valueEmail(this);
+    })
+
+}
+
+// Envoie de la requête au back
+submitForm();
+function submitForm() {
+
+    submit.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        let formValues = {
+            firstName : inputFirstName.value,
+            lastName : inputLastName.value,
+            address : inputAddress.value,
+            city : inputCity.value,
+            email : inputEmail.value
+        }
+
+        if (
+            !formValues.firstName || 
+            !valueFirstName() || 
+            !formValues.lastName || 
+            !valueLastName() ||
+            !formValues.address || 
+            !valueAddress() ||
+            !formValues.city || 
+            !valueCity() ||
+            !formValues.email ||
+            !valueEmail()) {
+            alert("Merci de renseigner toutes les informations")
+            return
+        } else {
+
+            let products = [];
+            for (let i=0; i < productSaveToLocalStorage.length; i++) {
+                products.push(productSaveToLocalStorage[i].id);
+                products.push(productSaveToLocalStorage[i].color);
+                products.push(productSaveToLocalStorage[i].quantity);
+            }
+
+            let formData = {
+                products : products,
+                contact : formValues,
+            }
+            console.log(formData);
+            // fetch("http://localhost:3000/api/products/order", {
+            //     method: "POST",
+            //     body: JSON.stringify(formData),
+            //     headers: {
+            //         "Content-Type": "application/json"
+            //     }
+            // })
+            //     .then((res) => res.json())
+            //     .then((data) => {
+            //         window.location.href = './confirmation.html?id='+ data.orderId;
+            //     })
+        }
+    })
+}

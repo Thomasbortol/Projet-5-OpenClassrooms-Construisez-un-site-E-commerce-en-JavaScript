@@ -96,7 +96,7 @@ function orderClick(){
     const quantity = document.querySelector("#quantity").value  // Va chercher les valeurs ( au moment du click) de couleur et quantité
     if (checkErrorValue(color, quantity)) return  // * vérifie si les valeurs sont incorrectes ( bloque la redirection si valeurs nulles) *
     saveOrder(color, quantity)                    // ** Enregistre les data **
-    rootToCart()                                  // *** Redirige sur la page panier ***
+    //rootToCart()                                  // *** Redirige sur la page panier ***
 }
 
 
@@ -114,7 +114,6 @@ function checkErrorValue(color, quantity){
 
 // **  Enregistre les data et les transformes en objet JSON **
 function saveOrder(color, quantity){
-    const key = `${productId}-${color}`
     const productData = {
     id : productId,
     color : color,
@@ -124,7 +123,28 @@ function saveOrder(color, quantity){
     altTxt : imgAltTxt,
     name : productName
     }
-    localStorage.setItem(key, JSON.stringify(productData))
+
+
+    // Declaration de variable dans laquelle on met les keys et values qui sont dans le local storage
+    let productSaveToLocalStorage = JSON.parse(localStorage.getItem("produit"));
+    // .parse transforme un "objet" JSON en langage javascript
+
+    //fonction ajouter un produit dans le localstorage ( Ajout des productData dans le tableau (l.146) et transformation en JSON)
+    const ajoutProduitLocalStorage = () => {
+        productSaveToLocalStorage.push(productData);
+        localStorage.setItem("produit", JSON.stringify(productSaveToLocalStorage));
+        // .stringify transforme en format JSON
+    }
+
+    // Si il y a dejà un produit enregistré dans le local storage On push les données dans le tableau (Key + value)
+    if (productSaveToLocalStorage) {
+        ajoutProduitLocalStorage();
+    } 
+    // Si il n'y a pas de produit enregistré dans le local storage On crée un tableau, et on push les données (Key + Value)
+    else {
+        productSaveToLocalStorage = [];
+        ajoutProduitLocalStorage();
+    }
 }
 
 

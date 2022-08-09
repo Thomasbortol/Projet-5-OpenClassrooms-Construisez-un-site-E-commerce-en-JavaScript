@@ -96,7 +96,7 @@ function orderClick(){
     const quantity = document.querySelector("#quantity").value  // Va chercher les valeurs ( au moment du click) de couleur et quantité
     if (checkErrorValue(color, quantity)) return  // * vérifie si les valeurs sont incorrectes ( bloque la redirection si valeurs nulles) *
     saveOrder(color, quantity)                    // ** Enregistre les data **
-    //rootToCart()                                  // *** Redirige sur la page panier ***
+    rootToCart()                                  // *** Redirige sur la page panier ***
 }
 
 

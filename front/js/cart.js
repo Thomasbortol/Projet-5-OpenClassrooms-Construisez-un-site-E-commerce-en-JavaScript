@@ -149,8 +149,8 @@ let submit = document.querySelector("#order")
 
 // REGEX Création de 3 objets regex  (Besoin d'un regex spécifique pour l'adresse, et pour l'email)
 let regularRegExp = new RegExp("^[a-zA-Z ,.'-]+$");
-let addressRegExp = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
-let emailRegExp = new RegExp("^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,20}$");
+let addressRegExp = new RegExp("^[0-9]{1,4}(?:(?:[,.' ]){1}[-a-zA-Zàâäéèêëïîôöùûüç0-9]+)+$");
+let emailRegExp = new RegExp("^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$");
 
 
 // method .test permet de tester la compatibilité entre l'objet regex et la chaine de caractère
@@ -240,23 +240,23 @@ function valueEmail() {
 getForm()
 function getForm() { 
 
-    form.firstName.addEventListener('change', () => {
+    form.firstName.addEventListener('input', () => {
         valueFirstName(this);
     })
 
-    form.lastName.addEventListener('change', () => {
+    form.lastName.addEventListener('input', () => {
         valueLastName(this);
     })
 
-    form.address.addEventListener('change', () => {
+    form.address.addEventListener('input', () => {
         valueAddress(this);
     })
 
-    form.city.addEventListener('change', () => {
+    form.city.addEventListener('input', () => {
         valueCity(this);
     })
 
-    form.email.addEventListener('change', () => {
+    form.email.addEventListener('input', () => {
         valueEmail(this);
     })
 
@@ -276,7 +276,7 @@ function submitForm() {
             city : inputCity.value,
             email : inputEmail.value
         }
-
+        // Utilisation du NON logique (!) Retourne l'opposé de la valeur boléene reçue
         if (
             !formValues.firstName || 
             !valueFirstName() || 

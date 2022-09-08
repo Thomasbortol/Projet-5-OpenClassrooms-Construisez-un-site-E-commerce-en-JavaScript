@@ -3,131 +3,158 @@ let productSaveToLocalStorage = JSON.parse(localStorage.getItem("produit"));
 // .parse transforme un "objet" JSON en langage javascript
 
 
+let panier = []
 
 
+function getProduct(product) {
+    fetch("http://localhost:3000/api/products/" + product.id)
+    .then((res) => res.json())
+    .then((data) => addProduct({...product, ...data}))
+}
 
+////// ************* Affichage des produits dans le panier ************* //////
+function addProduct(product) {
+        // Création de l'élément "article"
+        let cartItems = document.getElementById("cart__items");
+        let cartItem = document.createElement("article");
+        cartItem.classList.add("cart__item");
+        cartItems.appendChild(cartItem);
 
-//////////////// Affichage des produits ///////////////////////
+        // Création de l'élément "img"
+        let cartImg = document.createElement("div");
+        cartImg.classList.add("cart__item__img");
+        let img = document.createElement("img");
+        img.src = product.imageUrl;
+        img.alt = product.altTxt;
+        cartImg.appendChild(img);
+        cartItem.appendChild(cartImg);
+        
+        // Création des éléments "description" pour le nom, la couleur et le prix         
+        let cartContent = document.createElement("div");
+        cartContent.classList.add("cart__item__content");
+        cartItem.appendChild(cartContent);
 
+        let cartContentDescription = document.createElement("div");
+        cartContentDescription.classList.add("cart__item__content__description")
+        cartContent.appendChild(cartContentDescription)
+        let productName = document.createElement("h2");
+        let productInfo = document.createElement("p");
+        let productPrice = document.createElement("p")
+        productName.textContent = product.name;
+        productInfo.textContent = product.color;
+        productPrice.textContent = product.price + "€";
+        cartContentDescription.appendChild(productName);
+        cartContentDescription.appendChild(productInfo);
+        cartContentDescription.appendChild(productPrice);
 
+        // Création des éléments "settings" pour la quantité et la suppression
+        let settings = document.createElement("div");
+        settings.classList.add("cart__item__content__settings");
+        cartItem.appendChild(settings);
 
+        let settingsQty = document.createElement("div");
+        settingsQty.classList.add("cart__item__content__settings__quantity");
+        settings.appendChild(settingsQty);
 
-// On selectionne l'élément d'id #cart__items pour injecter l'html
-const blockProduit = document.querySelector("#cart__items");
-let panier = [];
-// Si le panier est vide
-if (productSaveToLocalStorage === null || productSaveToLocalStorage == 0) {
-    let titreIfPanierVide = document.querySelector("h1");
+        let qty = document.createElement("p");
+        settingsQty.appendChild(qty);
+        qty.textContent = "Qté : "
+
+        let qtyNumber = document.createElement("input");
+        qtyNumber.classList.add("itemQuantity");
+        settingsQty.appendChild(qtyNumber);
+        qtyNumber.setAttribute("type", "number");
+        qtyNumber.setAttribute("min", "1");
+        qtyNumber.setAttribute("max", "100");
+        qtyNumber.setAttribute ("value", product.quantity)
+
+        // Au changement de la quantité 
+        qtyNumber.addEventListener("change", (e) => {
+            // On récupère le panier qui est dans le Local Storage
+            let panierLocalStorage = JSON.parse(localStorage.getItem("produit"));
+            // On récupère l'ancienne quantité 
+            let oldQty = Number(product.quantity)
+            // On modifie la quantité du local storage
+            panierLocalStorage = panierLocalStorage.map(el => {
+                if (el.id == product.id && el.color == product.color) {
+                    return {...el, quantity:Number(e.target.value)}
+                }
+                return el;
+            })
+            product.quantity = Number(e.target.value)
+            localStorage.setItem("produit", JSON.stringify(panierLocalStorage));
+            majTotals(oldQty, product.quantity, product.price)
+        })
+
+        // A la suppression d'un article
+        let settingsDelete = document.createElement("div");
+        settingsDelete.classList.add("cart__item__content__settings__delete");
+        settings.appendChild(settingsDelete);
+
+        let deleteItem = document.createElement("p");
+        deleteItem.classList.add("deleteItem");
+        settingsDelete.appendChild(deleteItem);
+        deleteItem.textContent = "Supprimer";
+
+        // Au clic sur le bouton "Supprimer"
+        deleteItem.addEventListener("click", () => { 
+            // On récupère le panier qui est dans le Local Storage
+            let panierLocalStorage = JSON.parse(localStorage.getItem("produit"));
+
+            panierLocalStorage = panierLocalStorage.filter(el => (el.id !== product.id || el.color !== product.color));
+            localStorage.setItem("produit", JSON.stringify(panierLocalStorage));
+            alert("Votre article a bien été supprimé");
+            cartItem.remove();
+            location.reload();
+            majTotals(product.quantity, product.price);
+        })  
+}
+
+// Modification du prix total et de la quantité totale 
+function majTotals(oldValue, newValue, price) {
+    let productTotalQuantity = document.getElementById("totalQuantity");
+    let totalMajProductQte = productTotalQuantity.textContent;
+    productTotalQuantity.textContent = totalMajProductQte - oldValue + newValue;
+
+    let productTotalPrice = document.getElementById("totalPrice");
+    let totalMajProductPrix = productTotalPrice.textContent;
+    productTotalPrice.textContent = totalMajProductPrix - (oldValue * price) + newValue * price;    
+}
+
+// Affichage du prix total et de la quantité totale
+async function totals(panier) {
+    let totalQty = 0;
+    let totalPrice = 0;
+
+    for (let i=0; i < panier.length; i++){
+        const response = await fetch("http://localhost:3000/api/products/" + panier[i].id)
+        const p = await response.json()
+        addProduct({...panier[i], ...p});
+
+        totalQty += panier[i].quantity 
+        totalPrice += panier[i].quantity * p.price
+    }
+
+    let productTotalQuantity = document.getElementById("totalQuantity");
+    productTotalQuantity.textContent = totalQty;
+
+    let productTotalPrice = document.getElementById("totalPrice");
+    productTotalPrice.textContent = totalPrice;
+}
+// Si le panier est vide 
+if (productSaveToLocalStorage === null || productSaveToLocalStorage.length === 0) {
+
+    let titleCart = document.querySelector("h1");
     let sectionCart = document.querySelector(".cart");
 
-    titreIfPanierVide.innerHTML = "Votre panier est vide";
+    titleCart.innerHTML = "Votre panier est vide";
     sectionCart.style.display = "none";
+
 } 
 // Si le panier n'est pas vide
 else {
-    
-    for (i = 0; i < productSaveToLocalStorage.length; i++){
-    panier = panier + `\
-    <article class="cart__item" data-id="${productSaveToLocalStorage[i].id}" data-color="${productSaveToLocalStorage[i].color}">\
-    <div class="cart__item__img">\
-        <img src="${productSaveToLocalStorage[i].imageUrl}" alt="${productSaveToLocalStorage[i].altTxt}">\
-    </div>\
-    <div class="cart__item__content">\
-        <div class="cart__item__content__description">\
-        <h2>${productSaveToLocalStorage[i].name}</h2>\
-        <p>${productSaveToLocalStorage[i].color}</p>\
-        <p>${productSaveToLocalStorage[i].price} €</p>\
-        </div>\
-        <div class="cart__item__content__settings">\
-            <div class="cart__item__content__settings__quantity">\
-            <p>Qté :</p>\
-            <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${productSaveToLocalStorage[i].quantity}">\
-            </div>\
-            <div class="cart__item__content__settings__delete">\
-            <p class="deleteItem">Supprimer</p>\
-            </div>\
-        </div>\
-    </div>\
-    </article>`;
-    }
 
-    //injection html dans la page panier
-    blockProduit.innerHTML = panier;
-}
-
-
-
-
-
-////////////// Suppression d'un article ///////////////
-
-
-// Selection du bouton supprimer et mise en forme d'Array pour pouvoir utiliser addeventListener
-buttonSupr = Array.from(document.querySelectorAll(".deleteItem")); // Mise en forme nodeliste ===> Array
-let tab = [];
-
-// supprimer l'élément
-for (let i = 0; i < buttonSupr.length; i++){
-    buttonSupr[i].addEventListener("click", (e) => {
-        e.preventDefault();
-        buttonSupr[i].parentElement.style.display = "none";
-
-        let tab = productSaveToLocalStorage;
-        tab.splice([i],1);
-
-        productSaveToLocalStorage = localStorage.setItem("produit", JSON.stringify(tab));
-
-        window.location.href = "cart.html";
-    })
-};
-
-
-
-//////////////// Total prix du panier ////////////////////////
-
-// déclaration variable en tableau pour y mettre les prix et quantités qui sont présents dans le panier
-let calculTotalPrix = []
-let calculTotalQuantity = []
-
-
-// aller chercher les prix et les quantités
-pickPriceAndQuantity()
-function pickPriceAndQuantity(){
-    for (let j = 0; j < productSaveToLocalStorage.length; j++){
-        // On déclare le prix unitaire des articles
-        let prixArticleUnitairePanier = productSaveToLocalStorage[j].price;
-        // On déclare la quantité des articles
-        let quantiteArticle = productSaveToLocalStorage[j].quantity;
-        // On multiplie le prix unitaire par la quantité (Pour un article, la boucle se charge de le faire sur touts les produits présents)
-        let prixParArticle = prixArticleUnitairePanier * quantiteArticle;
-        // On push les résultats dans le tableau variable ( un résultat de multiplication pour chaque produit unique)
-        calculTotalPrix.push(prixParArticle)
-        // On push le total de la quantité uniquement pour pouvoir calculer uniquement la quantité
-        calculTotalQuantity.push(quantiteArticle);
-    }
-}
-
-// On additionne les résultats des multiplication pour obtenir le total et on l'affiche
-displayTotalPrice();
-function displayTotalPrice(){
-    const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    // On utilise la method reduce pour aditionner les prix
-    const prixTotal = calculTotalPrix.reduce(reducer, 0);
-    //Affichage du total du prix
-    let totalPrice = document.querySelector("#totalPrice");
-    totalPrice.textContent = prixTotal;
-}
-
-
-// On aditionne les résultats de la quantité pour obtenir la quantité totale et on l'affiche
-displayTotalQuantity();
-function displayTotalQuantity(){
-    const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    // on utilise la méthod reduce à nouveau, ici pour additionner les quantitées
-    const quantiteTotale = calculTotalQuantity.reduce(reducer, 0);
-    // Affichage du total de la quantité
-    let totalQuantity = document.querySelector("#totalQuantity");
-    totalQuantity.textContent = quantiteTotale;
+    totals(productSaveToLocalStorage)
 }
 
 
@@ -159,7 +186,7 @@ function valueFirstName() {
     let firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
     let inputFirstName = document.querySelector("#firstName");
 
-    if (regularRegExp.test(inputFirstName.value)) {
+    if (regularRegExp.test(inputFirstName.value)) {             // method .test
         firstNameErrorMsg.innerHTML = '';
         inputFirstName.style.backgroundColor = "white";
         return true

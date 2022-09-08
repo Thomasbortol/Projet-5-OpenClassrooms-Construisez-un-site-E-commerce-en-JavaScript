@@ -6,9 +6,8 @@ let prix = 0
 let imgLink, imgAltTxt, productName
 
 //Résupération de l'objet grâce à l'id dans l'api
-fetch(`http://localhost:3000/api/products/${productId}`)
-    .then((res) => res.json())
-    .then(res => uniqueObject(res))
+
+getProduct(productId);
 
 
 
@@ -122,10 +121,10 @@ function saveOrder(color, quantity){
     id : productId,
     color : color,
     quantity : Number(quantity),
-    price : prix,
-    imageUrl : imgLink,
-    altTxt : imgAltTxt,
-    name : productName
+    // price : prix,
+    // imageUrl : imgLink,
+    // altTxt : imgAltTxt,
+    // name : productName
     }
 
 

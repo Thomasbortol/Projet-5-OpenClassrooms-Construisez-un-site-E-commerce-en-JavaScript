@@ -100,6 +100,7 @@ function addProduct(product) {
         deleteItem.addEventListener("click", () => { 
             // On récupère le panier qui est dans le Local Storage
             let panierLocalStorage = JSON.parse(localStorage.getItem("produit"));
+            // .parse transforme un "objet" JSON en langage javascript
 
             panierLocalStorage = panierLocalStorage.filter(el => (el.id !== product.id || el.color !== product.color));
             localStorage.setItem("produit", JSON.stringify(panierLocalStorage));
@@ -322,26 +323,24 @@ function submitForm() {
             let products = [];
             for (let i=0; i < productSaveToLocalStorage.length; i++) {
                 products.push(productSaveToLocalStorage[i].id);
-                products.push(productSaveToLocalStorage[i].color);
-                products.push(productSaveToLocalStorage[i].quantity);
             }
 
             let formData = {
                 products : products,
                 contact : formValues,
             }
-            console.log(formData);
-            // fetch("http://localhost:3000/api/products/order", {
-            //     method: "POST",
-            //     body: JSON.stringify(formData),
-            //     headers: {
-            //         "Content-Type": "application/json"
-            //     }
-            // })
-            //     .then((res) => res.json())
-            //     .then((data) => {
-            //         window.location.href = './confirmation.html?id='+ data.orderId;
-            //     })
+            
+            fetch("http://localhost:3000/api/products/order", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    window.location.href = './confirmation.html?id='+ data.orderId;
+                })
         }
     })
 }

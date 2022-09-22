@@ -6,6 +6,11 @@ let prix = 0
 let imgLink, imgAltTxt, productName
 
 //Résupération de l'objet grâce à l'id dans l'api
+function getProduct(productId){
+    fetch(`http://localhost:3000/api/products/${productId}`)
+        .then((res) => res.json())
+        .then((res) => uniqueObject(res))
+}
 
 getProduct(productId);
 
@@ -79,22 +84,16 @@ function makeProductColors(colors){
 
 //    LOCAL STORAGE    ///
 
-
-
-
 // On séléctionne le bouton et on lui donne un événement au click
 const button = document.querySelector("#addToCart")
 button.addEventListener("click", orderClick)
-
-
-
 
 // Fonction qui détermine l'évènement du click
 function orderClick(){
     const color = document.querySelector("#colors").value
     const quantity = document.querySelector("#quantity").value  // Va chercher les valeurs ( au moment du click) de couleur et quantité
     if (checkErrorValue(color, quantity)) return  // * vérifie si les valeurs sont incorrectes ( bloque la redirection si valeurs nulles) *
-    saveOrder(color, quantity)                    // ** Enregistre les data **
+    saveOrder(color, quantity)                    // ** Enregistre les data dans le local storage **
     rootToCart()                                  // *** Redirige sur la page panier ***
 }
 

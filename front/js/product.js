@@ -125,31 +125,30 @@ function saveOrder(color, quantity){
     // altTxt : imgAltTxt,
     // name : productName
     }
-
-
     // Declaration de variable dans laquelle on met les keys et values qui sont dans le local storage
     let productSaveToLocalStorage = JSON.parse(localStorage.getItem("produit"));
     // .parse transforme un "objet" JSON en langage javascript
 
-    //fonction ajouter un produit dans le localstorage ( Ajout des productData dans le tableau (l.146) et transformation en JSON)
-    const ajoutProduitLocalStorage = () => {
+    // Si le local storage est vide
+    if (productSaveToLocalStorage === null) {
+        productSaveToLocalStorage= [];
         productSaveToLocalStorage.push(productData);
         localStorage.setItem("produit", JSON.stringify(productSaveToLocalStorage));
-        // .stringify transforme en format JSON
-    }
-
-    // Si il y a dejà un produit enregistré dans le local storage On push les données dans le tableau (Key + value)
-    if (productSaveToLocalStorage) {
-        ajoutProduitLocalStorage();
-    } 
-    // Si il n'y a pas de produit enregistré dans le local storage On crée un tableau, et on push les données (Key + Value)
-    else {
-        productSaveToLocalStorage = [];
-        ajoutProduitLocalStorage();
-    }
+    // Si le local storage n'est pas vide
+    } else {
+        // cherche un canapé de même couleur et id que le canapé séléctioné  .find trouve le premier élément correspondant dans le tableau
+        const found = productSaveToLocalStorage.find(element => element.id == productData.id && element.color == productData.color);
+        // Si aucun canapé dans le local storage correspond à l"élément .find
+        if (found == undefined) {
+            productSaveToLocalStorage.push(productData);
+            localStorage.setItem("produit", JSON.stringify(productSaveToLocalStorage));
+        // Si un canapé correspond à l'élément, alors additionne la quantité 
+        } else {
+            found.quantity += productData.quantity;
+            localStorage.setItem("produit", JSON.stringify(productSaveToLocalStorage));
+        }
+    }   
 }
-
-
 
 
 // *** Redirige vers la page panier ***

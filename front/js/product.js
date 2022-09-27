@@ -136,7 +136,7 @@ function saveOrder(color, quantity){
         localStorage.setItem("produit", JSON.stringify(productSaveToLocalStorage));
     // Si le local storage n'est pas vide
     } else {
-        // cherche un canapé de même couleur et id que le canapé séléctioné  .find trouve le premier élément correspondant dans le tableau
+        // cherche un canapé de même couleur et id que le canapé séléctioné  .find trouve le premier élément correspondant dans le tableau renvoie undefined si il n'en trouve aucun
         const found = productSaveToLocalStorage.find(element => element.id == productData.id && element.color == productData.color);
         // Si aucun canapé dans le local storage correspond à l"élément .find
         if (found == undefined) {
